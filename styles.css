@@ -1,0 +1,77 @@
+:root {
+  --card-size: 50px;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+  padding: 10px;
+}
+
+#mainRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: left;
+  padding-bottom: 20px;
+}
+
+#playerRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: left;
+}
+
+#drawPile {
+  flex-grow: 1;
+}
+
+#heatPile {
+  flex-grow: 3;
+}
+
+#discardPile {
+  flex-grow: 1;
+}
+
+#hand {
+  flex-grow: 1;
+}
+
+#play {
+  flex-grow: 1;
+}
+
+.heat-card-front {
+  border-color: #000000;
+  border-width: 3px;
+  display: flex;
+  background-color: #84dcf4;
+  justify-content: left;
+  align-items: left;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  & > span {
+    font-size: 20px;
+    text-align: center;
+  }
+}
+
+.heat-card-front.heat-card-heat {
+  background-color: #c63e3e;
+}
+
+
+.heat-card-front.heat-card-plus {
+  background-color: #b09797;
+}
+
+.card-back {
+  background-color: #6354a4;
+  border-color: #000000;
+  height: 100%;
+  width: 100%;
+}
