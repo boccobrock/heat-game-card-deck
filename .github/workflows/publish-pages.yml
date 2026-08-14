@@ -1,0 +1,45 @@
+name: Publish to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
+      - name: Determine build directory
+        id: find
+        run: |
+          if [ -d ./dist ]; then echo "dir=dist" >> $GITHUB_OUTPUT
+          elif [ -d ./public ]; then echo "dir=public" >> $GITHUB_OUTPUT
+          else echo "dir=." >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload artifact for Pages
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ${{ steps.find.outputs.dir }}
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1
