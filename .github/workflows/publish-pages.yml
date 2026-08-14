@@ -31,6 +31,7 @@ jobs:
           if [ -d ./dist ]; then echo "dir=dist" >> $GITHUB_OUTPUT
           elif [ -d ./public ]; then echo "dir=public" >> $GITHUB_OUTPUT
           else echo "dir=." >> $GITHUB_OUTPUT
+          fi
         shell: bash
 
       - name: Configure Pages
