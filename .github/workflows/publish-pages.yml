@@ -44,7 +44,7 @@ jobs:
       - name: Upload artifact for Pages
         uses: actions/upload-artifact@v4
         with:
-          name: pages
+          name: github-pages
           path: ${{ steps.find.outputs.dir }}
 
       - name: Deploy to GitHub Pages
