@@ -15,8 +15,11 @@ const HeatCardElement = (card: HeatCard) => {
     if (type == '+') {
         card.classList.add("heat-card-plus");
     }
-    if (type == 'H') {
+    else if (type == 'H') {
         card.classList.add("heat-card-heat");
+    }
+    else {
+        card.classList.add("heat-card-speed");
     }
     card.appendChild(span);
     return card;

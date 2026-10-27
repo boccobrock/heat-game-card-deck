@@ -54,24 +54,94 @@ body {
   align-items: left;
   overflow-wrap: break-word;
   word-break: break-word;
+  position: relative;
   & > span {
     font-size: 20px;
     text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* Flame effect for heat cards */
+.heat-card-front.heat-card-heat::before {
+  content: "🔥";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px;
+  opacity: 0.8;
+  animation: flame-pulse 1.5s infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Speed effect for speed cards */
+.heat-card-front.heat-card-speed::before {
+  content: "🏎️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px;
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Warning effect for plus cards */
+.heat-card-front.heat-card-plus::before {
+  content: "⚠️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px;
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes flame-pulse {
+  0% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
   }
 }
 
 .heat-card-front.heat-card-heat {
   background-color: #c63e3e;
+  position: relative;
 }
-
 
 .heat-card-front.heat-card-plus {
   background-color: #b09797;
+  position: relative;
 }
 
 .card-back {
-  background-color: #6354a4;
   border-color: #000000;
   height: 100%;
   width: 100%;
+  background-image: repeating-linear-gradient(
+    90deg,
+    #000000 0px,
+    #000000 10px,
+    #ffffff 10px,
+    #ffffff 20px
+  ),
+  repeating-linear-gradient(
+    0deg,
+    #000000 0px,
+    #000000 10px,
+    #ffffff 10px,
+    #ffffff 20px
+  );
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
 }
