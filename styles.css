@@ -63,6 +63,16 @@ body {
 
 #heatPile {
   flex-grow: 3;
+  cursor: pointer;
+  position: relative;
+}
+
+#heatPile * {
+  pointer-events: none;
+}
+
+#heatPile > * {
+  pointer-events: auto;
 }
 
 #discardPile {
@@ -89,6 +99,10 @@ body {
 
 #play {
   flex-grow: 1;
+}
+
+#play .deck-base {
+  width: 300px;
 }
 
 .heat-card-front {

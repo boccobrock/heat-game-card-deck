@@ -103,23 +103,6 @@ discardDiv?.appendChild(discardPile.container);
 const drawDiv = document.getElementById("drawPile");
 drawDiv?.appendChild(drawPile.container);
 
-// Add draw button functionality
-const drawButton = document.getElementById("drawButton");
-drawButton?.addEventListener("click", () => {
-  // Calculate how many cards are needed to reach 7
-  const currentHandSize = playerHand.cardElements.length;
-  const cardsNeeded = Math.max(0, 7 - currentHandSize);
-
-  if (cardsNeeded > 0) {
-    deal(cardsNeeded, drawPile, playerHand, 100).then(() => {
-      // Flip the newly drawn cards
-      playerHand.cardElements.slice(-cardsNeeded).forEach(card => {
-        card.flip();
-      });
-    });
-  }
-});
-
 const handDiv = document.getElementById("hand");
 handDiv?.appendChild(playerHand.container);
 
@@ -133,7 +116,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     // Calculate how many cards are needed to reach 7
     const currentHandSize = playerHand.cardElements.length;
     const cardsNeeded = Math.max(0, 7 - currentHandSize);
-    
+
     if (cardsNeeded > 0) {
       deal(cardsNeeded, drawPile, playerHand, 100).then(() => {
         // Flip the newly drawn cards
@@ -146,9 +129,59 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   const playCardsButton = document.getElementById("playCardsButton");
   playCardsButton?.addEventListener("click", () => {
-    // Move all cards from play pile to discard pile
-    if (playPile.cardElements.length > 0) {
-      deal(playPile.cardElements.length, playPile, discardPile, 100);
+    // Check for '+' cards in the play pile
+    const plusCards = playPile.cardElements.filter(card => card.card.type === '+');
+
+    if (plusCards.length > 0) {
+      // For each '+' card, draw a card from the deck
+      let drawCount = plusCards.length;
+
+      // Process each '+' card one at a time
+      const processPlusCard = () => {
+        if (drawCount <= 0 || drawPile.cardElements.length === 0) {
+          // Move all cards from play pile to discard pile
+          if (playPile.cardElements.length > 0) {
+            deal(playPile.cardElements.length, playPile, discardPile, 100);
+          }
+          return;
+        }
+
+        // Draw one card from the deck
+        deal(1, drawPile, playerHand, 100).then(() => {
+          const drawnCard = playerHand.cardElements[playerHand.cardElements.length - 1];
+
+          // Flip the drawn card
+          if (drawnCard) {
+            drawnCard.flip();
+
+            // Wait 1 second before processing next card
+            setTimeout(() => {
+              // Check if drawn card is a number (1-4)
+              if (drawnCard && ['1', '2', '3', '4'].includes(drawnCard.card.type)) {
+                // Put it in the play pile
+                deal(1, playerHand, playPile, 100);
+              } else {
+                // Put it in the discard pile
+                deal(1, playerHand, discardPile, 100);
+              }
+
+              drawCount--;
+              // Process next '+' card
+              processPlusCard();
+            }, 1000);
+          } else {
+            drawCount--;
+            processPlusCard();
+          }
+        });
+      };
+
+      processPlusCard();
+    } else {
+      // If no '+' cards, just move all cards from play pile to discard pile
+      if (playPile.cardElements.length > 0) {
+        deal(playPile.cardElements.length, playPile, discardPile, 100);
+      }
     }
   });
 
@@ -168,7 +201,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   // draw pile
-  drawPile.container.addEventListener("touchend", () => {
+  drawPile.container.addEventListener("click", () => {
     if (playerHand.cardElements.length < 7) {
       drawPile.topCardElement.flip();
       deal(1, drawPile, playerHand, 100);
@@ -185,16 +218,13 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // heat pile
   heatPile.applyCascadeLayout("cascade");
-  heatPile.container.addEventListener("touchend", () => {
-    deal(1, heatPile, discardPile, 100);
-  });
-  heatPile.container.addEventListener("click", () => {
+  heatDiv?.addEventListener("click", () => {
     deal(1, heatPile, discardPile, 100);
   });
   heatPile.options.groupDrag = false;
 
   // discard pile
-  discardPile.container.addEventListener("touchend", (e) => {
+  discardPile.container.addEventListener("click", (e) => {
     discardPile.cardElements.forEach((card) => {
       if (card.faceUp) {
         card.flip();
