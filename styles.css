@@ -13,8 +13,17 @@ body {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-around;
-  align-items: left;
+  align-items: center;
   padding-bottom: 20px;
+}
+
+#buttonRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  gap: 15px;
 }
 
 #playerRow {
@@ -29,12 +38,49 @@ body {
   flex-grow: 1;
 }
 
+#drawButton, #playCardsButton {
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #d3d3d3;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#drawButton:hover, #playCardsButton:hover {
+  background-color: #c0c0c0;
+}
+
+.button-text {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 #heatPile {
   flex-grow: 3;
 }
 
 #discardPile {
   flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+#discardPile::before {
+  content: '🗑️';
+  font-size: 24px;
+  opacity: 0.7;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 #hand {
@@ -128,20 +174,11 @@ body {
   border-color: #000000;
   height: 100%;
   width: 100%;
-  background-image: repeating-linear-gradient(
-    90deg,
-    #000000 0px,
-    #000000 10px,
-    #ffffff 10px,
-    #ffffff 20px
-  ),
-  repeating-linear-gradient(
-    0deg,
-    #000000 0px,
-    #000000 10px,
-    #ffffff 10px,
-    #ffffff 20px
-  );
-  background-position: 0 0, 10px 10px;
-  background-size: 20px 20px;
+  background-image:
+    linear-gradient(45deg, #ccc 26%, transparent 26%),
+    linear-gradient(135deg, #ccc 26%, transparent 26%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(135deg, transparent 75%, #ccc 75%);
+  background-size: 20px 20px; /* Must be a square */
+  background-position: 0 0, 10px 0, 10px -10px, 0px 10px; /* Must be half of one side of the square */
 }

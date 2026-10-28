@@ -103,6 +103,23 @@ discardDiv?.appendChild(discardPile.container);
 const drawDiv = document.getElementById("drawPile");
 drawDiv?.appendChild(drawPile.container);
 
+// Add draw button functionality
+const drawButton = document.getElementById("drawButton");
+drawButton?.addEventListener("click", () => {
+  // Calculate how many cards are needed to reach 7
+  const currentHandSize = playerHand.cardElements.length;
+  const cardsNeeded = Math.max(0, 7 - currentHandSize);
+
+  if (cardsNeeded > 0) {
+    deal(cardsNeeded, drawPile, playerHand, 100).then(() => {
+      // Flip the newly drawn cards
+      playerHand.cardElements.slice(-cardsNeeded).forEach(card => {
+        card.flip();
+      });
+    });
+  }
+});
+
 const handDiv = document.getElementById("hand");
 handDiv?.appendChild(playerHand.container);
 
@@ -110,6 +127,31 @@ const playDiv = document.getElementById("play");
 playDiv?.appendChild(playPile.container);
 
 window.addEventListener("DOMContentLoaded", async () => {
+  // Add button functionality after DOM is loaded
+  const drawButton = document.getElementById("drawButton");
+  drawButton?.addEventListener("click", () => {
+    // Calculate how many cards are needed to reach 7
+    const currentHandSize = playerHand.cardElements.length;
+    const cardsNeeded = Math.max(0, 7 - currentHandSize);
+    
+    if (cardsNeeded > 0) {
+      deal(cardsNeeded, drawPile, playerHand, 100).then(() => {
+        // Flip the newly drawn cards
+        playerHand.cardElements.slice(-cardsNeeded).forEach(card => {
+          card.flip();
+        });
+      });
+    }
+  });
+
+  const playCardsButton = document.getElementById("playCardsButton");
+  playCardsButton?.addEventListener("click", () => {
+    // Move all cards from play pile to discard pile
+    if (playPile.cardElements.length > 0) {
+      deal(playPile.cardElements.length, playPile, discardPile, 100);
+    }
+  });
+
   // setup
   deal(6, drawPile, heatPile, 100).then(() => {
     heatPile.cardElements.forEach((card) => {
@@ -127,8 +169,10 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // draw pile
   drawPile.container.addEventListener("touchend", () => {
-    drawPile.topCardElement.flip();
-    deal(1, drawPile, playerHand, 100);
+    if (playerHand.cardElements.length < 7) {
+      drawPile.topCardElement.flip();
+      deal(1, drawPile, playerHand, 100);
+    }
   });
 
   // player hand
@@ -142,6 +186,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   // heat pile
   heatPile.applyCascadeLayout("cascade");
   heatPile.container.addEventListener("touchend", () => {
+    deal(1, heatPile, discardPile, 100);
+  });
+  heatPile.container.addEventListener("click", () => {
     deal(1, heatPile, discardPile, 100);
   });
   heatPile.options.groupDrag = false;
