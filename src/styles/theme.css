@@ -1,0 +1,479 @@
+@font-face {
+  font-family: 'Crete Round';
+  src: url('https://card-factory.info/fonts/creteround-regular-webfont.woff2') format('woff2'),
+       url('https://card-factory.info/fonts/creteround-regular-webfont.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+:root {
+  --card-size: 50px;
+  --card-width: calc(var(--card-size) * 2.5);  /* 125px */
+  --card-height: calc(var(--card-size) * 3.5); /* 175px */
+  --card-radius: calc(0.15 * var(--card-size)); /* 7.5px */
+  --card-flip-speed: 0.35s;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  min-height: 100vh;
+  font-family: 'Crete Round', serif, system-ui;
+  background-color: rgb(175, 157, 149);
+  background-image: 
+    url("https://card-factory.info/images/gradient-squares.png"),
+    radial-gradient(circle, rgba(118, 60, 28, 0.35), rgba(0, 0, 0, 1)),
+    radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.4));
+  background-size: auto, cover, cover;
+  background-repeat: repeat, no-repeat, no-repeat;
+  background-position: center, center, center;
+  background-attachment: fixed, scroll, scroll;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.game-header {
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+  margin-bottom: 8px;
+}
+
+.game-header h1 {
+  margin: 0 0 4px 0;
+  font-size: 28px;
+  letter-spacing: 1.5px;
+}
+
+.game-header p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* Rows matching original layout */
+#mainRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding-bottom: 10px;
+  gap: 20px;
+}
+
+#buttonRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  gap: 15px;
+}
+
+#playerRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.pile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pile-label {
+  color: #ffffff;
+  font-size: 14px;
+  margin-bottom: 6px;
+  font-weight: bold;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pile-badge {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+/* Piles */
+#drawPile {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#heatPile {
+  flex-grow: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+#discardPile {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+#hand {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#play {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Base deck container matching card-factory */
+.deck-base {
+  width: var(--card-width);
+  height: var(--card-height);
+  border-radius: var(--card-radius);
+  background-color: rgba(0, 0, 0, 0.25);
+  position: relative;
+  box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.6);
+  transition: box-shadow 0.2s, background-color 0.2s;
+}
+
+.deck-base.clickable {
+  cursor: pointer;
+}
+
+.deck-base.clickable:hover {
+  background-color: rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.4);
+}
+
+.deck-base.drag-over {
+  background-color: rgba(132, 220, 244, 0.25);
+  box-shadow: inset 0 0 0 3px #84dcf4, 0 0 14px rgba(132, 220, 244, 0.7);
+  transform: scale(1.02);
+}
+
+#heatPile .deck-base {
+  width: calc(var(--card-width) + 160px);
+  min-width: calc(var(--card-width) + 160px);
+}
+
+#hand .deck-base {
+  width: calc(var(--card-width) + 260px);
+  min-width: calc(var(--card-width) + 260px);
+}
+
+#play .deck-base {
+  width: calc(var(--card-width) + 220px);
+  min-width: calc(var(--card-width) + 220px);
+}
+
+/* Discard pile trash bin icon */
+.discard-empty-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Card deal-in animation */
+@keyframes card-deal-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(-20px, -30px, 0) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Card components with smooth cascade positioning and 3D flip */
+.card-container {
+  box-sizing: border-box;
+  width: var(--card-width);
+  height: var(--card-height);
+  border-radius: var(--card-radius);
+  position: absolute;
+  perspective: 1200px;
+  cursor: default;
+  transition: left 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+              top 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+              transform 0.25s cubic-bezier(0.25, 1, 0.5, 1),
+              filter 0.2s ease,
+              opacity 0.2s ease;
+  animation: card-deal-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform, left, top;
+}
+
+.card-container.interactive {
+  cursor: pointer;
+}
+
+.card-container.interactive:hover {
+  transform: translateY(-10px) scale(1.05);
+  z-index: 99 !important;
+  filter: brightness(1.08);
+}
+
+.card-container.card-dragging {
+  opacity: 0.45;
+  transform: scale(0.95) rotate(-2deg);
+  transition: none;
+}
+
+/* 3D Flip container */
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform var(--card-flip-speed) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+  box-sizing: border-box;
+  border-radius: var(--card-radius);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.card-shadow {
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Card Back */
+.card-back {
+  background-color: #222240;
+  border: 2px solid #000000;
+  background-image:
+    linear-gradient(45deg, #bbb 26%, transparent 26%),
+    linear-gradient(135deg, #bbb 26%, transparent 26%),
+    linear-gradient(45deg, transparent 75%, #bbb 75%),
+    linear-gradient(135deg, transparent 75%, #bbb 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 0, 10px -10px, 0px 10px;
+  transform: rotateY(180deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Card Front */
+.heat-card-front {
+  border: 3px solid #000000;
+  background-color: #84dcf4;
+  padding: 8px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+}
+
+.heat-card-front > .card-number {
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  color: #000;
+  background: rgba(255, 255, 255, 0.65);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Card color themes */
+.heat-card-front.heat-card-heat {
+  background-color: #c63e3e;
+}
+
+.heat-card-front.heat-card-plus {
+  background-color: #b09797;
+}
+
+.heat-card-front.heat-card-speed {
+  background-color: #84dcf4;
+}
+
+/* Enhanced center icon effects with animations */
+.heat-card-front.heat-card-heat::before {
+  content: "🔥";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 44px;
+  opacity: 0.85;
+  animation: flame-pulse 1.4s infinite alternate ease-in-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.heat-card-front.heat-card-speed::before {
+  content: "🏎️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 44px;
+  opacity: 0.85;
+  animation: speed-pulse 2.2s infinite alternate ease-in-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.heat-card-front.heat-card-plus::before {
+  content: "⚠️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 44px;
+  opacity: 0.85;
+  animation: warning-pulse 1.8s infinite ease-in-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes flame-pulse {
+  0% {
+    opacity: 0.55;
+    transform: translate(-50%, -50%) scale(0.92);
+    filter: drop-shadow(0 0 2px rgba(255, 69, 0, 0.6));
+  }
+  50% {
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(1.12) rotate(2deg);
+    filter: drop-shadow(0 0 6px rgba(255, 140, 0, 0.8));
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.24) rotate(-2deg);
+    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.95));
+  }
+}
+
+@keyframes speed-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.96);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.06);
+    opacity: 0.95;
+    filter: drop-shadow(0 0 4px rgba(0, 100, 255, 0.4));
+  }
+}
+
+@keyframes warning-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.12);
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(255, 200, 0, 0.7));
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+}
+
+/* Action Buttons */
+#drawButton,
+#playCardsButton {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #d3d3d3;
+  color: #222;
+  border: 2px solid rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.15s ease-in-out;
+}
+
+#drawButton:hover:not(:disabled),
+#playCardsButton:hover:not(:disabled) {
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+#drawButton:active:not(:disabled),
+#playCardsButton:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#drawButton:disabled,
+#playCardsButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.button-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
