@@ -128,43 +128,72 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   const playCardsButton = document.getElementById("playCardsButton");
+  
+  // Helper function to calculate and update play pile total
+  const updatePlayPileTotal = () => {
+    let total = 0;
+    playPile.cardElements.forEach(cardEl => {
+      const type = cardEl.card.type;
+      const parsed = parseInt(type, 10);
+      if (!isNaN(parsed)) {
+        total += parsed;
+      } else if (type === '1 | 5') {
+        // Default to 1 or handle as needed, let's treat as 1 or add both? Usually base value or first number. Let's add 1 or let's check.
+        total += 1;
+      }
+    });
+    
+    const buttonTextSpan = playCardsButton?.querySelector(".button-text");
+    if (buttonTextSpan) {
+      buttonTextSpan.textContent = `Play Cards (Total: ${total})`;
+    }
+  };
+
   playCardsButton?.addEventListener("click", () => {
     // Check for '+' cards in the play pile
     const plusCards = playPile.cardElements.filter(card => card.card.type === '+');
-
+    
     if (plusCards.length > 0) {
       // For each '+' card, draw a card from the deck
       let drawCount = plusCards.length;
-
+      
       // Process each '+' card one at a time
       const processPlusCard = () => {
         if (drawCount <= 0 || drawPile.cardElements.length === 0) {
           // Move all cards from play pile to discard pile
           if (playPile.cardElements.length > 0) {
-            deal(playPile.cardElements.length, playPile, discardPile, 100);
+            deal(playPile.cardElements.length, playPile, discardPile, 100).then(() => {
+              updatePlayPileTotal();
+            });
+          } else {
+            updatePlayPileTotal();
           }
           return;
         }
-
+        
         // Draw one card from the deck
         deal(1, drawPile, playerHand, 100).then(() => {
           const drawnCard = playerHand.cardElements[playerHand.cardElements.length - 1];
-
+          
           // Flip the drawn card
           if (drawnCard) {
             drawnCard.flip();
-
+            
             // Wait 1 second before processing next card
             setTimeout(() => {
               // Check if drawn card is a number (1-4)
               if (drawnCard && ['1', '2', '3', '4'].includes(drawnCard.card.type)) {
                 // Put it in the play pile
-                deal(1, playerHand, playPile, 100);
+                deal(1, playerHand, playPile, 100).then(() => {
+                  updatePlayPileTotal();
+                });
               } else {
                 // Put it in the discard pile
-                deal(1, playerHand, discardPile, 100);
+                deal(1, playerHand, discardPile, 100).then(() => {
+                  updatePlayPileTotal();
+                });
               }
-
+              
               drawCount--;
               // Process next '+' card
               processPlusCard();
@@ -175,12 +204,16 @@ window.addEventListener("DOMContentLoaded", async () => {
           }
         });
       };
-
+      
       processPlusCard();
     } else {
       // If no '+' cards, just move all cards from play pile to discard pile
       if (playPile.cardElements.length > 0) {
-        deal(playPile.cardElements.length, playPile, discardPile, 100);
+        deal(playPile.cardElements.length, playPile, discardPile, 100).then(() => {
+          updatePlayPileTotal();
+        });
+      } else {
+        updatePlayPileTotal();
       }
     }
   });
